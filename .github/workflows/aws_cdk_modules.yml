@@ -99,15 +99,25 @@ jobs:
             role-to-assume: ${{env.AWS_ASSUME_ROLE}}
             role-session-name: ${{ github.event.repository.name }}-${{ steps.date.outputs.date }}
             aws-region: ${{ env.AWS_REGION }}
+        - name: List files
+          run: |
+            ls
+        - name: List files again
+          run: |
+            ls
+          working-directory: ${{env.CDK_MODULE}}
+        
+        - name: Grant permissions to all files
+          run: | 
+            chmod -R 755 ${{env.CDK_MODULE}}
+
         - name: Copy cdk config files
           run: |
             rm -r ${{env.CDK_MODULE}}/config_files/*
             cp -a ${{inputs.config_files_directory}}/. ${{env.CDK_MODULE}}/config_files/
             cp -a ${{env.PROJECT_FILES_DIRECTORY}}/. ${{env.CDK_MODULE}}/
 
-        - name: Grant permissions to all files
-          run: | 
-            chmod -R 755 ${{env.CDK_MODULE}}
+        
 
         - name: Install CDK
           if: ${{ steps.skip_cdk.outputs.bypass_cdk !='true'}}
