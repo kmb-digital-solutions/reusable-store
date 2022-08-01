@@ -80,7 +80,7 @@ jobs:
           uses: actions/checkout@v2
           with:
             token: ${{ secrets.envPAT }}
-            repository: mitchboulay/beer-project-properties
+            repository: mitchboulay/sba-project-properties
             ref: main
             path: ${{env.PROJECT_FILES_DIRECTORY}}
         
