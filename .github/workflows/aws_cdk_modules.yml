@@ -80,7 +80,7 @@ jobs:
         - name: Get project constants from project.properties repo - Branch name, deployment role, skip cdk, destroy stack
           id: project_constants
           run: |
-            account_id="`grep ${{ github.event.repository.name }} ${{env.PROJECT_FILES_NAME}}|cut -d'=' -f2`"
+            account_id="`grep aws-sba-development ${{env.PROJECT_FILES_NAME}}|cut -d'=' -f2`"
             echo "::set-output name=env_id::${account_id}"
             echo "AWS_ENVRIONMENT=${account_id}" >> $GITHUB_ENV
 
