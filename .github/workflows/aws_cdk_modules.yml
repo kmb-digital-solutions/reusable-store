@@ -38,7 +38,7 @@ permissions:
 jobs:
   
   AWS-CDK-Deployment:
-    if: github.repository != 'mitchboulay/reusable-store'
+    if: github.repository != 'kmb-digital-solutions/reusable-store'
     runs-on: ubuntu-latest
     steps:
         # Get current time stamp to use as reference elsewhere
@@ -60,7 +60,7 @@ jobs:
           uses: actions/checkout@v2
           with:
             token: ${{ secrets.envPAT }}
-            repository: mitchboulay/sba-project-properties
+            repository: simple-business-apps/sba-project-properties
             ref: main
             path: ${{env.PROJECT_FILES_DIRECTORY}}
         
@@ -68,7 +68,7 @@ jobs:
           uses: actions/checkout@v2
           with:
             token: ${{ secrets.envPAT }}
-            repository: mitchboulay/aws-cdk-modules
+            repository: kmb-digital-solutions/aws-cdk-modules
             ref: main
             path: ${{env.CDK_MODULE}}
             
