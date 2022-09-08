@@ -226,7 +226,7 @@ jobs:
 
         - name: Hosting bucket
           run: |
-            echo "HOSTING_BUCKET=${{inputs.hosting_bucket}}-${{env.AWS_ENV_NAME}}" >> $GITHUB_ENV
+            echo "HOSTING_BUCKET=${{inputs.hosting_bucket}}" >> $GITHUB_ENV
         
         - name: Cloudfront id output
           run: |
