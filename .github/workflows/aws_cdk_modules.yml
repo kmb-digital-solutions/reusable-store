@@ -18,7 +18,7 @@ on:
 env:
   #BUCKET_NAME : "github-oidc-test-mitch"
   AWS_REGION : "us-east-1"
-  PROJECT_FILES_GIT : "sba-project-properties.git"
+  PROJECT_FILES_GIT : "strc-project-properties.git"
   PROJECT_FILES_NAME: "project.properties"
   PROJECT_FILES_DIRECTORY: "project_file"
   IMAGE_REGISTRY: "ghcr.io"
@@ -60,7 +60,7 @@ jobs:
           uses: actions/checkout@v2
           with:
             token: ${{ secrets.envPAT }}
-            repository: simple-business-apps/sba-project-properties
+            repository: simple-business-apps/strc-project-properties
             ref: main
             path: ${{env.PROJECT_FILES_DIRECTORY}}
         
@@ -80,7 +80,7 @@ jobs:
         - name: Get project constants from project.properties repo - Branch name, deployment role, skip cdk, destroy stack
           id: project_constants
           run: |
-            account_id="`grep aws-sba-development ${{env.PROJECT_FILES_NAME}}|cut -d'=' -f2`"
+            account_id="`grep aws-strc-development ${{env.PROJECT_FILES_NAME}}|cut -d'=' -f2`"
             echo "::set-output name=env_id::${account_id}"
             echo "AWS_ENVRIONMENT=${account_id}" >> $GITHUB_ENV
 
@@ -90,8 +90,8 @@ jobs:
         - name: Arn to use
           id: aws_assume_role
           run: |
-            echo "::set-output name=role_arn1::arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/sba-github-oidc-access-role"
-            echo "AWS_ASSUME_ROLE=arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/sba-github-oidc-access-role" >> $GITHUB_ENV
+            echo "::set-output name=role_arn1::arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/strc-github-oidc-access-role"
+            echo "AWS_ASSUME_ROLE=arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/strc-github-oidc-access-role" >> $GITHUB_ENV
       
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@master
