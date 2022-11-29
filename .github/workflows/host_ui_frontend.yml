@@ -47,6 +47,7 @@ env:
   PROJECT_FILES_DIRECTORY: "project_file"
   CDK_MODULE: "cdk_checkedout"
   DEVOPS_STORE: "devops_store"
+  CI: ""
 
 permissions:
       id-token: write
