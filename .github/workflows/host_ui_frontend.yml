@@ -41,7 +41,7 @@ on:
 
 env:
   AWS_REGION : "us-east-1"
-  PROJECT_FILES_GIT : "sba-project-properties.git"
+  PROJECT_FILES_GIT : "strc-project-properties.git"
   ORGANIZATION: "kmb-digital-solutions"
   PROJECT_FILES_NAME: "project.properties"
   PROJECT_FILES_DIRECTORY: "project_file"
