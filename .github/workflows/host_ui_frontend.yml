@@ -77,15 +77,10 @@ jobs:
           run: |
             echo "BUILD_DIRECTORY=dist" >> $GITHUB_ENV
 
-        - name: Build directory nx
-          if: ${{inputs.build_project_type == 'nx' }}
+        - name: Build directory react
+          if: ${{inputs.build_project_type == 'react' }}
           run: |
-            echo "BUILD_DIRECTORY=dist/apps/sbapps-web" >> $GITHUB_ENV
-
-        - name: Build directory storybook
-          if: ${{inputs.build_project_type == 'storybook' }}
-          run: |
-            echo "BUILD_DIRECTORY=dist/storybook/ui-components" >> $GITHUB_ENV
+            echo "BUILD_DIRECTORY=build" >> $GITHUB_ENV
         
         - name: Build directory echo
           run: echo $BUILD_DIRECTORY
@@ -116,7 +111,7 @@ jobs:
           uses: actions/checkout@v2
           with:
             token: ${{ secrets.envPAT }}
-            repository: simple-business-apps/sba-project-properties
+            repository: simple-business-apps/strc-project-properties
             ref: main
             path: ${{env.PROJECT_FILES_DIRECTORY}}
         
@@ -160,12 +155,6 @@ jobs:
           if: ${{inputs.build_project_type == 'swagger'}}
           run: |
             npx openapi-generator-cli generate -i swagger.yaml -g typescript-axios -o libs/api-client/src/generated
-        
-        - name: Build Storybok
-          if: ${{inputs.build_project_type == 'storybook'}}
-          run: |
-            npm ci
-            NODE_ENV=development npx nx build-storybook ui-components
 
         - name: Get project constants from project.properties repo - Branch name, deployment role, skip cdk, destroy stack
           id: project_constants
@@ -196,23 +185,22 @@ jobs:
             cp -a ${{env.PROJECT_FILES_DIRECTORY}}/. ${{env.CDK_MODULE}}/
 
         - name: Create NX environment varibles file
-          if: ${{inputs.build_project_type == 'nx'}}
+          if: ${{inputs.build_project_type == 'react'}}
           run: |
             pip3 install boto3
             pip3 install jproperties
             mv .env .env_old
             python3 ${{env.PROJECT_FILES_DIRECTORY}}/create_env_file.py
-            cat .env
             
-        - name: Build nx Frontend
-          if: ${{inputs.build_project_type == 'nx'}}
+        - name: Build react Frontend
+          if: ${{inputs.build_project_type == 'react'}}
           run: |
             npm ci
             if [[ ${BRANCH_NAME} == 'main' ]]
             then
-              npx nx build
+              npm run build
             else
-              npx nx run sbapps-web:build:staging
+              npm run build
             fi
         
         - name: Install yaml
