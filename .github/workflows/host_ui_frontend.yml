@@ -189,6 +189,8 @@ jobs:
             pip3 install boto3
             pip3 install jproperties
             python3 ${{env.PROJECT_FILES_DIRECTORY}}/create_env_file.py
+            ls
+            cat .env
             
         - name: Build react Frontend
           if: ${{inputs.build_project_type == 'react'}}
