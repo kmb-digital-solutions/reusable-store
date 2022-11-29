@@ -192,7 +192,7 @@ jobs:
         - name: Build react Frontend
           if: ${{inputs.build_project_type == 'react'}}
           run: |
-            npm install
+            npm ci
             if [[ ${BRANCH_NAME} == 'main' ]]
             then
               npm run build
