@@ -31,6 +31,9 @@ on:
       in_cloudfront_output:
         required: true
         type: string
+      
+      build_argon2:
+        type: string
         
 
     secrets:
@@ -204,7 +207,7 @@ jobs:
             fi
 
         - name: Build react Frontend2
-          if: ${{inputs.build_project_type == 'react2'}}
+          if: ${{inputs.build_argon2 == 'react'}}
           run: |
             
             npm install --save react@latest --force
