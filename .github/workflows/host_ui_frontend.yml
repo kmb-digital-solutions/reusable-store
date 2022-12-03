@@ -196,7 +196,7 @@ jobs:
             
             
         - name: Build react Frontend
-          if: ${{inputs.build_project_type == 'react'}}
+          if: ${{inputs.build_argon2 != 'react'}}
           run: |
             npm ci
             if [[ ${BRANCH_NAME} == 'main' ]]
