@@ -202,7 +202,14 @@ jobs:
             else
               npm run build
             fi
-        
+
+        - name: Build react Frontend2
+          if: ${{inputs.build_project_type == 'react2'}}
+          run: |
+            
+            npm install --save react@latest --force
+            npm run build
+
         - name: Install yaml
           run: |
             pip install pyyaml
