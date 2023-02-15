@@ -211,6 +211,7 @@ jobs:
           run: |
             
             npm install react@17.0.2
+            npm ci
             npm run build
 
         - name: Install yaml
