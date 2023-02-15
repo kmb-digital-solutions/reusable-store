@@ -210,7 +210,7 @@ jobs:
           if: ${{inputs.build_argon2 == 'react'}}
           run: |
             
-            npm install react@17.0.2
+            npm install react@latest
             npm ci
             npm run build
 
