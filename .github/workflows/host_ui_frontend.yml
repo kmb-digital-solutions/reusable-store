@@ -210,8 +210,7 @@ jobs:
           if: ${{inputs.build_argon2 == 'react'}}
           run: |
             
-            npm install react@latest
-            npm ci
+            npm install --save react@latest --force
             npm run build
 
         - name: Install yaml
