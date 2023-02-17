@@ -196,7 +196,6 @@ jobs:
             
             
         - name: Build react Frontend
-          if: ${{inputs.build_argon2 != 'react'}}
           run: |
             npm ci
             if [[ ${BRANCH_NAME} == 'main' ]]
@@ -206,12 +205,12 @@ jobs:
               npm run build
             fi
 
-        - name: Build react Frontend2
-          if: ${{inputs.build_argon2 == 'react'}}
-          run: |
+        # - name: Build react Frontend2
+        #   if: ${{inputs.build_argon2 == 'react'}}
+        #   run: |
             
-            npm install --save react@latest --force
-            npm run build
+        #     npm install --save react@latest --force
+        #     npm run build
 
         - name: Install yaml
           run: |
