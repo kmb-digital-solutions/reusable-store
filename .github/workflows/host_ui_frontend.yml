@@ -199,6 +199,7 @@ jobs:
           if: ${{inputs.build_argon2 != 'react'}}
           run: |
             npm ci
+            npm install eslint-config-prettier --save
             if [[ ${BRANCH_NAME} == 'main' ]]
             then
               npm run build
