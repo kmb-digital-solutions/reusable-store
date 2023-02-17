@@ -195,23 +195,12 @@ jobs:
             ls
             
             
-        - name: Build react Frontend
-          if: ${{inputs.build_argon2 != 'react'}}
+        - name: Application dependency installation
           run: |
-            npm ci
-            npm install eslint-config-prettier --save
-            if [[ ${BRANCH_NAME} == 'main' ]]
-            then
-              npm run build
-            else
-              npm run build
-            fi
+            npm install --force
 
-        - name: Build react Frontend2
-          if: ${{inputs.build_argon2 == 'react'}}
-          run: |
-            
-            npm install --save react@latest --force
+        - name: Build react Frontend
+          run: |            
             npm run build
 
         - name: Install yaml
