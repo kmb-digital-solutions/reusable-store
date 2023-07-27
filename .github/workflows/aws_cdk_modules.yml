@@ -3,7 +3,7 @@ name: CDK Modules deployment
 # Controls when the workflow will run
 on:
   workflow_call:
-    inputs:  
+    inputs:
       config_files_directory:
         required: true
         type: string
@@ -17,137 +17,143 @@ on:
 
 env:
   #BUCKET_NAME : "github-oidc-test-mitch"
-  AWS_REGION : "us-east-1"
-  PROJECT_FILES_GIT : "strc-project-properties.git"
+  AWS_REGION: "us-east-1"
+  PROJECT_FILES_GIT: "hh-project-properties.git"
   PROJECT_FILES_NAME: "project.properties"
   PROJECT_FILES_DIRECTORY: "project_file"
   IMAGE_REGISTRY: "ghcr.io"
   IMAGE_REGISTRY_USERNAME: ${{github.actor}}
   IMAGE_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   CDK_MODULE: "cdk_checkedout"
-  API_GATEWAY_STACK_ID: strc-apigateway-0-iot-apigw
-  API_GATEWAY_OUPUT_LOOKUP: strcapigateway0iotapigwurloutput
-  
+  API_GATEWAY_STACK_ID: hh-apigateway-0-iot-apigw
+  API_GATEWAY_OUPUT_LOOKUP: hhapigateway0iotapigwurloutput
 
 permissions:
-      id-token: write
-      contents: read    # This is required for actions/checkout@v1
-      packages: write
+  id-token: write
+  contents: read # This is required for actions/checkout@v1
+  packages: write
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  
   AWS-CDK-Deployment:
     if: github.repository != 'kmb-digital-solutions/reusable-store'
     runs-on: ubuntu-latest
     steps:
-        # Get current time stamp to use as reference elsewhere
-        - name: Get current date
-          id: date
-          run: echo "::set-output name=date::$(date +'%Y%m%dT%H%M%S')"
+      # Get current time stamp to use as reference elsewhere
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%dT%H%M%S')"
 
-        # Clone repositories prior to work
-        - name: Git clone the repository
-          uses: actions/checkout@v2
-        
-        - name: Make project files directory
-          run: mkdir ${{env.PROJECT_FILES_DIRECTORY}}
-        
-        - name: Make cdk directory
-          run: mkdir ${{env.CDK_MODULE}}
-        
-        - name: Project files clone
-          uses: actions/checkout@v2
-          with:
-            token: ${{ secrets.envPAT }}
-            repository: simple-business-apps/strc-project-properties
-            ref: main
-            path: ${{env.PROJECT_FILES_DIRECTORY}}
-        
-        - name: CDK Modules clone
-          uses: actions/checkout@v2
-          with:
-            token: ${{ secrets.envPAT }}
-            repository: kmb-digital-solutions/aws-cdk-modules
-            ref: main
-            path: ${{env.CDK_MODULE}}
-            
-        # Grant permissions to all files in directory
-        - name: Grant permissions to all files
-          run: chmod -R 755 ./
-        
-        # Read of project files and set to variables
-        - name: Get project constants from project.properties repo - Branch name, deployment role, skip cdk, destroy stack
-          id: project_constants
-          run: |
-            account_id="`grep aws-strc-development ${{env.PROJECT_FILES_NAME}}|cut -d'=' -f2`"
-            echo "::set-output name=env_id::${account_id}"
-            echo "AWS_ENVRIONMENT=${account_id}" >> $GITHUB_ENV
+      # Get branch name to use for look up
+      - name: Branch if Dev
+        if: contains( github.ref, 'dev' )
+        run: |
+          echo "BRANCH_NAME=dev" >> $GITHUB_ENV
 
-          working-directory: ${{env.PROJECT_FILES_DIRECTORY}}
-        
-        # Role that will be used for OIDC. This is the role this session will assume when connecting to AWS         
-        - name: Arn to use
-          id: aws_assume_role
-          run: |
-            echo "::set-output name=role_arn1::arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/strc-github-oidc-access-role"
-            echo "AWS_ASSUME_ROLE=arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/strc-github-oidc-access-role" >> $GITHUB_ENV
-      
-        - name: Configure AWS credentials
-          uses: aws-actions/configure-aws-credentials@master
-          with:
-            role-to-assume: ${{env.AWS_ASSUME_ROLE}}
-            role-session-name: ${{ github.event.repository.name }}-${{ steps.date.outputs.date }}
-            aws-region: ${{ env.AWS_REGION }}
-        
-        - name: Grant permissions to all files
-          run: | 
-            chmod -R 755 ${{env.CDK_MODULE}}
+      - name: Branch if Integration
+        if: contains( github.ref, 'integration' )
+        run: |
+          echo "BRANCH_NAME=integration" >> $GITHUB_ENV
 
-        - name: Copy cdk config files
-          run: |
-            rm -r ${{env.CDK_MODULE}}/config_files/*
-            cp -a ${{inputs.config_files_directory}}/. ${{env.CDK_MODULE}}/config_files/
-            cp -a ${{env.PROJECT_FILES_DIRECTORY}}/. ${{env.CDK_MODULE}}/
+      - name: Branch if Production
+        if: ( contains( github.ref, 'production' )
+        run: |
+          echo "BRANCH_NAME=production" >> $GITHUB_ENV
 
-        - name: Install CDK
-          if: ${{ steps.skip_cdk.outputs.bypass_cdk !='true'}}
-          run: | 
-            sudo npm -g install aws-cdk@2.30.0
-            cat ${{env.CDK_MODULE}}/requirements.txt
-            pip3 install -r  ${{env.CDK_MODULE}}/requirements.txt
+      - name: Branch if BETA
+        if: contains( github.ref, 'beta' )
+        run: |
+          echo "BRANCH_NAME=beta" >> $GITHUB_ENV
 
-        - name: Check if Graphql exists
-          id: appsync_graphql
-          run: |
-            DIR="appsync/"
-            ls
-            if [ -d "$DIR" ]; then
-              # Take action if $DIR exists. #
-              echo "Found config files in ${DIR}..."
-              echo "::set-output name=graphql_found::true"
-            fi
-        
-        - name: Merge Graphql Files
-          if: ${{steps.appsync_graphql.outputs.graphql_found == 'true'}}
-          run: |
-            ls
-            rm -f all-schema.graphql
-            find appsync/ -type f -name '*.graphql' -exec cat {} + >> all-schema.graphql
-            ls
-            cat all-schema.graphql
-            cp all-schema.graphql appsync/all-schema.graphql
-            echo "GRAPHQL_DIRECTORY=appsync" >> $GITHUB_ENV
-            echo "SCHEMA_FILE_NAME=all-schema.graphql" >> $GITHUB_ENV
-        
-        - name: Grant permissions to all files
-          if: ${{steps.appsync_graphql.outputs.graphql_found == 'true'}}
-          run: | 
-            chmod -R 777 ./
-        # *****************PROJECT SPECIFIC ELEMENTS*****************
+      - name: Branch if Tools
+        if: contains( github.ref, 'tools' )
+        run: |
+          echo "BRANCH_NAME=tools" >> $GITHUB_ENV
 
-        - name: Running cdk deploy
-          if: ${{steps.get_cdk_destroy_stack.outputs.cdk_destroy_stack != 'true' && steps.skip_cdk.outputs.bypass_cdk !='true'}}
-          run: |
-            cdk deploy --all --require-approval never
-          working-directory: ${{env.CDK_MODULE}}
+      - name: Echo branch
+        run: echo "${BRANCH_NAME} is the branch name to use in lookup"
+
+      # Clone repositories prior to work
+      - name: Git clone the repository
+        uses: actions/checkout@v2
+
+      - name: Make project files directory
+        run: mkdir ${{env.PROJECT_FILES_DIRECTORY}}
+
+      - name: Make cdk directory
+        run: mkdir ${{env.CDK_MODULE}}
+
+      - name: Project files clone
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.envPAT }}
+          repository: host-hive-app/hh-project-properties
+          ref: main
+          path: ${{env.PROJECT_FILES_DIRECTORY}}
+
+      - name: CDK Modules clone
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.envPAT }}
+          repository: kmb-digital-solutions/aws-cdk-modules
+          ref: main
+          path: ${{env.CDK_MODULE}}
+
+      # Grant permissions to all files in directory
+      - name: Grant permissions to all files
+        run: chmod -R 755 ./
+
+      # Read of project files and set to variables
+      - name: Get project constants from project.properties repo - Branch name, deployment role, skip cdk, destroy stack
+        id: project_constants
+        run: |
+          account_id="`grep aws_${BRANCH_NAME}_account ${{env.PROJECT_FILES_NAME}}|cut -d'=' -f2`"
+          echo "AWS_ENVIRONMENT=${account_id}" >> $GITHUB_ENV
+
+        working-directory: ${{env.PROJECT_FILES_DIRECTORY}}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: ${{env.AWS_ASSUME_ROLE}}
+          role-session-name: ${{ github.event.repository.name }}-${{ steps.date.outputs.date }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Grant permissions to all files
+        run: |
+          chmod -R 755 ${{env.CDK_MODULE}}
+
+      - name: Copy cdk config files
+        run: |
+          rm -r ${{env.CDK_MODULE}}/config_files/*
+          cp -a ${{inputs.config_files_directory}}/. ${{env.CDK_MODULE}}/config_files/
+          cp -a ${{env.PROJECT_FILES_DIRECTORY}}/. ${{env.CDK_MODULE}}/
+
+      - name: Install CDK
+        if: ${{ steps.skip_cdk.outputs.bypass_cdk !='true'}}
+        run: |
+          sudo npm -g install aws-cdk@2.30.0
+          cat ${{env.CDK_MODULE}}/requirements.txt
+          pip3 install -r  ${{env.CDK_MODULE}}/requirements.txt
+
+      - name: Check if Graphql exists
+        id: appsync_graphql
+        run: |
+          DIR="appsync/"
+          ls
+          if [ -d "$DIR" ]; then
+            # Take action if $DIR exists. #
+            echo "Found config files in ${DIR}..."
+            echo "::set-output name=graphql_found::true"
+          fi
+
+      - name: Grant permissions to all files
+        if: ${{steps.appsync_graphql.outputs.graphql_found == 'true'}}
+        run: |
+          chmod -R 777 ./
+      # *****************PROJECT SPECIFIC ELEMENTS*****************
+      - name: Running cdk deploy
+        if: ${{steps.get_cdk_destroy_stack.outputs.cdk_destroy_stack != 'true' && steps.skip_cdk.outputs.bypass_cdk !='true'}}
+        run: |
+          cdk deploy --all --require-approval never
+        working-directory: ${{env.CDK_MODULE}}
