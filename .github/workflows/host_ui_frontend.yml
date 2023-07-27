@@ -183,18 +183,20 @@ jobs:
         run: |
           npx openapi-generator-cli generate -i swagger.yaml -g typescript-axios -o libs/api-client/src/generated
 
+      # Read of project files and set to variables
       - name: Get project constants from project.properties repo - Branch name, deployment role, skip cdk, destroy stack
         id: project_constants
         run: |
           account_id="`grep aws_${BRANCH_NAME}_account ${{env.PROJECT_FILES_NAME}}|cut -d'=' -f2`"
-          echo "::set-output name=env_id::${account_id}"
-          echo "AWS_ENVRIONMENT=${account_id}" >> $GITHUB_ENV
+          echo "AWS_ENVIRONMENT=${account_id}" >> $GITHUB_ENV
+
+        working-directory: ${{env.PROJECT_FILES_DIRECTORY}}
 
       - name: Arn to use
         id: aws_assume_role
         run: |
-          echo "::set-output name=role_arn1::arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/hh-github-oidc-access-role"
-          echo "AWS_ASSUME_ROLE=arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/hh-github-oidc-access-role" >> $GITHUB_ENV
+          echo "::set-output name=role_arn1::arn:aws:iam::${{ env.AWS_ENVIRONMENT }}:role/hh-github-oidc-access-role"
+          echo "AWS_ASSUME_ROLE=arn:aws:iam::${{ env.AWS_ENVIRONMENT }}:role/hh-github-oidc-access-role" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@master
