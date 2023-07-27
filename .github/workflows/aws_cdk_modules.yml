@@ -112,6 +112,12 @@ jobs:
 
         working-directory: ${{env.PROJECT_FILES_DIRECTORY}}
 
+      - name: Arn to use
+        id: aws_assume_role
+        run: |
+          echo "::set-output name=role_arn1::arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/hh-github-oidc-access-role"
+          echo "AWS_ASSUME_ROLE=arn:aws:iam::${{ steps.project_constants.outputs.env_id }}:role/hh-github-oidc-access-role" >> $GITHUB_ENV
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@master
         with:
