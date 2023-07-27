@@ -252,13 +252,6 @@ jobs:
         run: |
           aws s3 sync ./$BUILD_DIRECTORY s3://${HOSTING_BUCKET}
 
-      # Build & deploy docker image
-      - name: Copy Swagger json to s3
-        if: ${{inputs.build_project_type == 'swagger'}}
-        run: |
-          mv swagger.yaml open-api.yaml
-          aws s3 cp open-api.json s3://${HOSTING_BUCKET}
-          aws s3 cp open-api.yaml s3://${HOSTING_BUCKET}
       - name: Invalidate cloudfront cache
         run: |
           echo ${CF_ID_OUTPUT} is the output id
