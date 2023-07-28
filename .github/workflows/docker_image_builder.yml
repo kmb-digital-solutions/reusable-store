@@ -195,7 +195,7 @@ jobs:
           echo LAMBDA_FUNCTION_NAME="${{inputs.lambd_function_name}}" >> $GITHUB_ENV
 
       - name: Update function with new image built
-        if: ${{ !apprunner_deployment}}
+        if: ${{ !inputs.apprunner_deployment}}
         run: |
           (aws lambda update-function-code --region ${{ env.AWS_REGION }} --function-name $LAMBDA_FUNCTION_NAME --image-uri $DOCKER_TAG_VERSION ) || ( echo "Function not found" )
       - name: Trigger App Runner deployment
