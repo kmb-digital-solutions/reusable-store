@@ -11,8 +11,10 @@ on:
       build_project_type:
         required: true
         type: string
-
-      hosting_bucket:
+      hosting_bucket_stack_id:
+        required: true
+        type: string
+      hosting_bucket_key_name:
         required: true
         type: string
 
@@ -235,10 +237,6 @@ jobs:
         run: |
           echo "IN_STACK_ID=${{inputs.in_stack_id}}" >> $GITHUB_ENV
 
-      - name: Hosting bucket
-        run: |
-          echo "HOSTING_BUCKET=${{inputs.hosting_bucket}}" >> $GITHUB_ENV
-
       - name: Cloudfront id output
         run: |
           echo "CF_ID_OUTPUT=${{inputs.in_cloudfront_output}}cfoutput" >> $GITHUB_ENV
@@ -250,6 +248,8 @@ jobs:
       # Upload a file to AWS s3
       - name: Deploy to S3 - Copy Build folder to s3
         run: |
+
+          HOSTING_BUCKET=$(aws cloudformation --region ${{ env.AWS_REGION }} describe-stacks --stack-name ${{inputs.hosting_bucket_stack_id}} --query "Stacks[0].Outputs[?OutputKey=='${{inputs.hosting_bucket_key_name}}'].OutputValue" --output text)
           aws s3 sync ./$BUILD_DIRECTORY s3://${HOSTING_BUCKET}
 
       - name: Invalidate cloudfront cache
