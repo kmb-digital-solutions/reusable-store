@@ -5,9 +5,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
-      apprunner_deployment:
-        type: string
       lambd_function_name:
+        required: true
         type: string
     secrets:
       envPAT:
@@ -195,10 +194,6 @@ jobs:
           echo LAMBDA_FUNCTION_NAME="${{inputs.lambd_function_name}}" >> $GITHUB_ENV
 
       - name: Update function with new image built
-        if: ${{ !inputs.apprunner_deployment}}
+        if: ${{ steps.repo_name_passed.outputsreponamepassed !='true' && steps.get_cdk_destroy_stack.outputs.cdk_destroy_stack != 'true' && steps.ecr_login.outputs.repo_created =='false' && steps.skip_dk_build.outputs.bypass_dk_build !='true'}}
         run: |
           (aws lambda update-function-code --region ${{ env.AWS_REGION }} --function-name $LAMBDA_FUNCTION_NAME --image-uri $DOCKER_TAG_VERSION ) || ( echo "Function not found" )
-      - name: Trigger App Runner deployment
-        if: ${{ apprunner_deployment}}
-        run: |
-          python3 app_runner_deployment.py
