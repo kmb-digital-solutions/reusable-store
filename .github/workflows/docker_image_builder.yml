@@ -10,7 +10,7 @@ on:
         type: string
       app_runner:
         required: false
-        type: boolean
+        type: string
     secrets:
       envPAT:
         required: true
