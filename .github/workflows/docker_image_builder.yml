@@ -8,6 +8,9 @@ on:
       lambd_function_name:
         required: true
         type: string
+      app_runner:
+        required: false
+        type: boolean
     secrets:
       envPAT:
         required: true
@@ -197,3 +200,9 @@ jobs:
         if: ${{ steps.repo_name_passed.outputsreponamepassed !='true' && steps.get_cdk_destroy_stack.outputs.cdk_destroy_stack != 'true' && steps.ecr_login.outputs.repo_created =='false' && steps.skip_dk_build.outputs.bypass_dk_build !='true'}}
         run: |
           (aws lambda update-function-code --region ${{ env.AWS_REGION }} --function-name $LAMBDA_FUNCTION_NAME --image-uri $DOCKER_TAG_VERSION ) || ( echo "Function not found" )
+      - name: Deploy App runner
+        if: ${{inputs.app_runner == 'true'}}
+        run: |
+          pip3 install boto3
+          chmod 777 app_runner_deployment.py
+          python3 app_runner_deployment.py
