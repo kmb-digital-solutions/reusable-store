@@ -206,3 +206,9 @@ jobs:
           pip3 install boto3
           chmod 777 app_runner_deployment.py
           python3 app_runner_deployment.py
+      - name: Update ECS Service with latest image
+        if: ${{inputs.ecs == 'true'}}
+        run: |
+          pip3 install boto3
+          chmod 777 ecs_service_update.py
+          python3 ecs_service_update.py
