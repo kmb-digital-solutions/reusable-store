@@ -11,6 +11,9 @@ on:
       app_runner:
         required: false
         type: string
+      ecs:
+        required: false
+        type: string
     secrets:
       envPAT:
         required: true
