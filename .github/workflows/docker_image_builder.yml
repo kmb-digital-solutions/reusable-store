@@ -171,7 +171,9 @@ jobs:
         if: ${{github.event.repository.name == 'hh-hosthive-api'}}
         run: |
           chmod 777 .env
+          chmod 777 firebase_secrets.json
           cp .env src/.env
+          cp firebase_secrets.json src/firebase_secrets.json
 
       - name: Image Repository name
         run: |
