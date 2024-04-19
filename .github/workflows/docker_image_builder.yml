@@ -170,7 +170,7 @@ jobs:
       - name: Copy .env file to src directory
         if: ${{github.event.repository.name == 'hh-hosthive-api'}}
         run: |
-          chmod 777 src/.env
+          chmod 777 .env
           cp .env src/.env
 
       - name: Image Repository name
