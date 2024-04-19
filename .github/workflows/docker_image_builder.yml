@@ -158,6 +158,21 @@ jobs:
           cp ${{env.PROJECT_FILES_DIRECTORY}}/${{env.PROJECT_FILES_NAME}} .
           echo "done moving file to current directory.."
           ls
+      - name: Inject secrets into docker build if hh-hosthive-api
+        if: ${{github.event.repository.name == 'hh-hosthive-api'}}
+        run: |
+          pip3 install boto3
+          ls
+          chmod 777 retrieve_secrets.py
+          python3 retrieve_secrets.py
+      # from the firebase_secrets.json created, we will now inject the secrets into the environment variables
+      # Copy .env file to src directory
+      - name: Copy .env file to src directory
+        if: ${{github.event.repository.name == 'hh-hosthive-api'}}
+        run: |
+          chmod 777 src/.env
+          cp .env src/.env
+
       - name: Image Repository name
         run: |
           echo "IMAGE_REPO_NAME=${{ github.event.repository.name }}" >> $GITHUB_ENV
