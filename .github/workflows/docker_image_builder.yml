@@ -163,17 +163,15 @@ jobs:
         run: |
           pip3 install boto3
           ls
-          chmod 777 retrieve_secrets.py
-          python3 retrieve_secrets.py
+          chmod 777 hosthive_secrets.py
+          python3 hosthive_secrets.py
       # from the firebase_secrets.json created, we will now inject the secrets into the environment variables
       # Copy .env file to src directory
       - name: Copy .env file to src directory
         if: ${{github.event.repository.name == 'hh-hosthive-api'}}
         run: |
-          chmod 777 .env
-          chmod 777 firebase_secrets.json
-          cp .env src/.env
-          cp firebase_secrets.json src/firebase_secrets.json
+          chmod 777 src/.env
+          chmod 777 src/firebase_secrets.json
 
       - name: Image Repository name
         run: |
