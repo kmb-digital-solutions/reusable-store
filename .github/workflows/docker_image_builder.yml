@@ -167,11 +167,15 @@ jobs:
           python3 hosthive_secrets.py
       # from the firebase_secrets.json created, we will now inject the secrets into the environment variables
       # Copy .env file to src directory
-      - name: Copy .env file to src directory
-        if: ${{github.event.repository.name == 'hh-hosthive-api' || github.event.repository.name == 'hh-chat-connect'}}
+      - name: Copy .env file to src directory if hh-hosthive-api
+        if: ${{github.event.repository.name == 'hh-hosthive-api'}}
         run: |
           chmod 777 src/.env
           chmod 777 src/firebase_secrets.json
+      - name: Copy .env file to src directory if hh-chat-connect
+        if: ${{github.event.repository.name == 'hh-chat-connect'}}
+        run: |
+          chmod 777 src/.env
 
       - name: Image Repository name
         run: |
