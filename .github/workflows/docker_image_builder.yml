@@ -158,8 +158,8 @@ jobs:
           cp ${{env.PROJECT_FILES_DIRECTORY}}/${{env.PROJECT_FILES_NAME}} .
           echo "done moving file to current directory.."
           ls
-      - name: Inject secrets into docker build if hh-hosthive-api
-        if: ${{github.event.repository.name == 'hh-hosthive-api'}}
+      - name: Inject secrets into docker build if hh-hosthive-api or hh-chat-connect
+        if: ${{github.event.repository.name == 'hh-hosthive-api' || github.event.repository.name == 'hh-chat-connect'}}
         run: |
           pip3 install boto3
           ls
@@ -168,7 +168,7 @@ jobs:
       # from the firebase_secrets.json created, we will now inject the secrets into the environment variables
       # Copy .env file to src directory
       - name: Copy .env file to src directory
-        if: ${{github.event.repository.name == 'hh-hosthive-api'}}
+        if: ${{github.event.repository.name == 'hh-hosthive-api' || github.event.repository.name == 'hh-chat-connect'}}
         run: |
           chmod 777 src/.env
           chmod 777 src/firebase_secrets.json
