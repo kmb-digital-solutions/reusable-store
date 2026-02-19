@@ -188,6 +188,8 @@ jobs:
       - name: Build Docker images
         if: ${{steps.skip_dk_build.outputs.bypass_dk_build !='true'}}
         id: build_images
+        env:
+          DOCKER_BUILDKIT: 0
         run: |
           docker build --platform linux/amd64 -t $DOCKER_TAG_VERSION .
           docker tag $DOCKER_TAG_VERSION $DOCKER_TAG_LATEST
