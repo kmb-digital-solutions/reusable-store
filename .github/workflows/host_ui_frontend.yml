@@ -216,6 +216,14 @@ jobs:
           python3 ${{env.PROJECT_FILES_DIRECTORY}}/create_env_file.py
           ls
 
+      - name: Create NX environment varibles file
+        run: |
+          pip3 install boto3
+          pip3 install jproperties
+          mv .env .env_old
+          python3 ${{env.PROJECT_FILES_DIRECTORY}}/create_env_file.py
+          cat .env
+
       - name: Application dependency installation
         run: |
           npm install --force

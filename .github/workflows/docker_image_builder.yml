@@ -189,7 +189,7 @@ jobs:
         if: ${{steps.skip_dk_build.outputs.bypass_dk_build !='true'}}
         id: build_images
         run: |
-          docker build -t $DOCKER_TAG_VERSION .
+          docker build --platform linux/amd64 -t $DOCKER_TAG_VERSION .
           docker tag $DOCKER_TAG_VERSION $DOCKER_TAG_LATEST
 
       - name: ECR Login
